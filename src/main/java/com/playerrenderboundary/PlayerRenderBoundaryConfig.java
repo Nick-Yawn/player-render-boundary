@@ -1,4 +1,4 @@
-package com.example;
+package com.playerrenderboundary;
 
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
@@ -7,7 +7,7 @@ import net.runelite.client.config.Range;
 import java.awt.Color;
 
 @ConfigGroup("playerrenderboundary")
-public interface ExampleConfig extends Config
+public interface PlayerRenderBoundaryConfig extends Config
 {
 	@ConfigItem(
 		keyName = "boundaryColor",
@@ -41,3 +41,4 @@ public interface ExampleConfig extends Config
 		return 31;
 	}
 }
+

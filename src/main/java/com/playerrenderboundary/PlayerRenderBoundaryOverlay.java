@@ -1,4 +1,4 @@
-package com.example;
+package com.playerrenderboundary;
 
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -17,10 +17,10 @@ import net.runelite.client.ui.overlay.OverlayPosition;
 public class PlayerRenderBoundaryOverlay extends Overlay
 {
 	private final Client client;
-	private final ExampleConfig config;
+	private final PlayerRenderBoundaryConfig config;
 
 	@Inject
-	public PlayerRenderBoundaryOverlay(Client client, ExampleConfig config)
+	public PlayerRenderBoundaryOverlay(Client client, PlayerRenderBoundaryConfig config)
 	{
 		this.client = client;
 		this.config = config;

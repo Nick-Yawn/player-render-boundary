@@ -1,4 +1,4 @@
-package com.example;
+package com.playerrenderboundary;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
@@ -15,13 +15,13 @@ import net.runelite.client.ui.overlay.OverlayManager;
 	description = "Draws a boundary showing where other players and NPCs begin to render",
 	tags = {"player", "render", "boundary", "overlay"}
 )
-public class ExamplePlugin extends Plugin
+public class PlayerRenderBoundaryPlugin extends Plugin
 {
 	@Inject
 	private Client client;
 
 	@Inject
-	private ExampleConfig config;
+	private PlayerRenderBoundaryConfig config;
 
 	@Inject
 	private OverlayManager overlayManager;
@@ -44,8 +44,9 @@ public class ExamplePlugin extends Plugin
 	}
 
 	@Provides
-	ExampleConfig provideConfig(ConfigManager configManager)
+	PlayerRenderBoundaryConfig provideConfig(ConfigManager configManager)
 	{
-		return configManager.getConfig(ExampleConfig.class);
+		return configManager.getConfig(PlayerRenderBoundaryConfig.class);
 	}
 }
+
