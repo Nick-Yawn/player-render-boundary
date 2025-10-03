@@ -1,6 +1,6 @@
 # OSRS Player Render Boundary
 
-A RuneLite plugin that draws a square boundary centered at the player's true tile, showing where other players and NPCs begin to be rendered.
+A RuneLite plugin that draws a 31-tile square boundary centered at the player's true tile, showing where other players and NPCs begin to be rendered.
 
 ## Configuration
 
