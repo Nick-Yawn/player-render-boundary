@@ -1,5 +1,6 @@
 package com.playerrenderboundary;
 
+import net.runelite.client.config.Alpha;
 import net.runelite.client.config.Config;
 import net.runelite.client.config.ConfigGroup;
 import net.runelite.client.config.ConfigItem;
@@ -9,6 +10,7 @@ import java.awt.Color;
 @ConfigGroup("playerrenderboundary")
 public interface PlayerRenderBoundaryConfig extends Config
 {
+	@Alpha
 	@ConfigItem(
 		keyName = "boundaryColor",
 		name = "Boundary Color",
@@ -16,7 +18,7 @@ public interface PlayerRenderBoundaryConfig extends Config
 	)
 	default Color boundaryColor()
 	{
-		return Color.WHITE;
+		return new Color(255, 255, 255, 128);
 	}
 
 	@ConfigItem(
@@ -24,21 +26,11 @@ public interface PlayerRenderBoundaryConfig extends Config
 		name = "Boundary Width",
 		description = "The width of the boundary line in pixels"
 	)
-	@Range(min = 1, max = 10)
+	@Range(min = 1, max = 4)
 	default int boundaryWidth()
 	{
-		return 2;
+		return 1;
 	}
 
-	@ConfigItem(
-		keyName = "boundarySize",
-		name = "Boundary Size",
-		description = "The size of the boundary in tiles (width/height)"
-	)
-	@Range(min = 1, max = 100)
-	default int boundarySize()
-	{
-		return 31;
-	}
 }
 

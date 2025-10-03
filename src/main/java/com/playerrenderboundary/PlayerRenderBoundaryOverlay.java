@@ -1,18 +1,21 @@
 package com.playerrenderboundary;
 
 import java.awt.BasicStroke;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.awt.Polygon;
+
 import javax.inject.Inject;
+
 import net.runelite.api.Client;
 import net.runelite.api.Perspective;
-import net.runelite.api.Player;
+import net.runelite.api.WorldView;
+import net.runelite.api.Point;
 import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldPoint;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+
 
 public class PlayerRenderBoundaryOverlay extends Overlay
 {
@@ -31,96 +34,58 @@ public class PlayerRenderBoundaryOverlay extends Overlay
 	@Override
 	public Dimension render(Graphics2D graphics)
 	{
-		Player localPlayer = client.getLocalPlayer();
-		if (localPlayer == null)
+		graphics.setColor(config.boundaryColor());
+		graphics.setStroke(new BasicStroke(config.boundaryWidth()));
+
+		final WorldPoint playerPos = client.getLocalPlayer().getWorldLocation();
+		final WorldView wv = client.getLocalPlayer().getWorldView();
+		
+		if (playerPos == null)
 		{
 			return null;
 		}
+		final int plane = playerPos.getPlane();
 
-		LocalPoint playerLocation = localPlayer.getLocalLocation();
-		if (playerLocation == null)
-		{
-			return null;
-		}
+		int currentPosX = playerPos.getX();
+		int currentPosY = playerPos.getY();
 
-		int boundarySize = config.boundarySize();
-		int halfSize = boundarySize / 2;
-		
-		// Calculate the corners of the boundary square
-		// Each tile is 128 units in local coordinates
-		int tileSize = 128;
-		int offset = halfSize * tileSize;
+		drawBoundary(wv, currentPosX, currentPosY, plane, graphics);
 
-		// Get the four corners of the boundary square
-		LocalPoint northWest = new LocalPoint(
-			playerLocation.getX() - offset,
-			playerLocation.getY() + offset
-		);
-		LocalPoint northEast = new LocalPoint(
-			playerLocation.getX() + offset,
-			playerLocation.getY() + offset
-		);
-		LocalPoint southWest = new LocalPoint(
-			playerLocation.getX() - offset,
-			playerLocation.getY() - offset
-		);
-		LocalPoint southEast = new LocalPoint(
-			playerLocation.getX() + offset,
-			playerLocation.getY() - offset
-		);
-
-		// Convert to canvas points
-		Polygon northLine = getLine(northWest, northEast);
-		Polygon eastLine = getLine(northEast, southEast);
-		Polygon southLine = getLine(southEast, southWest);
-		Polygon westLine = getLine(southWest, northWest);
-
-		// Draw the boundary
-		Color color = config.boundaryColor();
-		int width = config.boundaryWidth();
-		
-		graphics.setColor(color);
-		graphics.setStroke(new BasicStroke(width));
-
-		if (northLine != null)
-		{
-			graphics.drawPolygon(northLine);
-		}
-		if (eastLine != null)
-		{
-			graphics.drawPolygon(eastLine);
-		}
-		if (southLine != null)
-		{
-			graphics.drawPolygon(southLine);
-		}
-		if (westLine != null)
-		{
-			graphics.drawPolygon(westLine);
-		}
-
-		return null;
+        return null;
 	}
 
-	private Polygon getLine(LocalPoint start, LocalPoint end)
+	private void drawBoundary(WorldView wv, int x, int y, int plane, Graphics2D graphics)
 	{
-		int plane = client.getPlane();
-		
-		// Get canvas points for both endpoints
-		net.runelite.api.Point startCanvas = Perspective.localToCanvas(client, start, plane);
-		net.runelite.api.Point endCanvas = Perspective.localToCanvas(client, end, plane);
-
-		if (startCanvas == null || endCanvas == null)
-		{
-			return null;
+		for( int i = -15; i <= 15; i++){
+			drawBorderAtTile(wv, x + i, y - 15, plane, graphics, new int[]{-1,-1,+1,-1});
+			drawBorderAtTile(wv, x + i, y + 15, plane, graphics, new int[]{-1,+1,+1,+1});
+			drawBorderAtTile(wv, x - 15, y + i, plane, graphics, new int[]{-1,-1,-1,+1});
+			drawBorderAtTile(wv, x + 15, y + i, plane, graphics, new int[]{+1,-1,+1,+1});
 		}
+	}
 
-		// Create a polygon representing the line
-		Polygon polygon = new Polygon();
-		polygon.addPoint(startCanvas.getX(), startCanvas.getY());
-		polygon.addPoint(endCanvas.getX(), endCanvas.getY());
+	private void drawBorderAtTile(WorldView wv, int x, int y, int plane, Graphics2D graphics, int[] f)
+	{
+		LocalPoint tile = LocalPoint.fromWorld(wv, x, y);
+		Point start = Perspective.localToCanvas(client, new LocalPoint(
+					tile.getX() + Perspective.LOCAL_HALF_TILE_SIZE * f[0],
+					tile.getY() + Perspective.LOCAL_HALF_TILE_SIZE * f[1],
+					wv),
+				plane);
+		Point end = Perspective.localToCanvas(client, new LocalPoint(
+				tile.getX() + Perspective.LOCAL_HALF_TILE_SIZE * f[2],
+				tile.getY() + Perspective.LOCAL_HALF_TILE_SIZE * f[3],
+				wv),
+			plane);
+		drawLine(graphics, start, end);
+	}
 
-		return polygon;
+	private void drawLine(Graphics2D graphics, Point start, Point end)
+	{
+		if (start == null || end == null)
+		{
+			return;
+		}
+		graphics.drawLine(start.getX(), start.getY(), end.getX(), end.getY());
 	}
 }
-
